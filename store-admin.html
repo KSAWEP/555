@@ -384,7 +384,24 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCHSSG-H8lARcSScKc6WX2xiYy5W5FmzUI",
+            authDomain: "nicecity-51aff.firebaseapp.com",
+            projectId: "nicecity-51aff",
+            storageBucket: "nicecity-51aff.firebasestorage.app",
+            messagingSenderId: "938934256525",
+            appId: "1:938934256525:web:415533592415996921f3c4",
+            measurementId: "G-G7GC7G0J03"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const defaultProducts = [
             { id: 1, name: "فك باند", price: 15.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/fRVZTQqfTh4BNwBabwODAbtVSwN4oZtaz1POer3E.png", category: "الباندات", inStock: true },
             { id: 2, name: "فك باند نهائي", price: 40.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/eZVJuhUkBNzs7kp3D1GsLTqEmLSm69WeUBSoCMpV.png", category: "الباندات", inStock: true },
@@ -437,7 +454,32 @@
             { id: 49, name: "𝐌𝐀𝐙𝐀𝐃", price: 5.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/o3VqGchhBqXkhjaeythknierIkxSHKzMP4Cc2X81.png", category: "خدمات", inStock: true }
         ];
 
-        let products = JSON.parse(localStorage.getItem('nicecity_products')) || defaultProducts;
+        let products = [];
+
+        // Load products from Firebase
+        async function loadProducts() {
+            try {
+                const snapshot = await db.collection('products').get();
+                if (snapshot.empty) {
+                    // First time - upload default products
+                    for (const p of defaultProducts) {
+                        await db.collection('products').doc(p.id.toString()).set(p);
+                    }
+                    products = defaultProducts;
+                } else {
+                    products = [];
+                    snapshot.forEach(doc => {
+                        products.push(doc.data());
+                    });
+                }
+                renderProducts();
+            } catch (error) {
+                console.error('Firebase Error:', error);
+                products = defaultProducts;
+                renderProducts();
+                showToast('خطأ في الاتصال بقاعدة البيانات');
+            }
+        }
 
         function renderProducts(filtered = null) {
             const data = filtered || products;
@@ -491,7 +533,7 @@
         function closeModal() { document.getElementById('productModal').classList.remove('active'); }
         function editProduct(id) { openModal(id); }
 
-        function saveProduct() {
+        async function saveProduct() {
             const id = document.getElementById('productId').value;
             const product = {
                 id: id ? parseInt(id) : Date.now(),
@@ -502,28 +544,39 @@
                 inStock: document.getElementById('productInStock').checked
             };
 
-            if (!product.name || !product.price) { showToast('يرجى ملء جميع الحقول', 'error'); return; }
+            if (!product.name || !product.price) { showToast('يرجى ملء جميع الحقول'); return; }
 
-            if (id) {
-                const index = products.findIndex(p => p.id === parseInt(id));
-                products[index] = product;
-                showToast('تم تعديل المنتج');
-            } else {
-                products.push(product);
-                showToast('تم إضافة المنتج');
+            try {
+                await db.collection('products').doc(product.id.toString()).set(product);
+                
+                if (id) {
+                    const index = products.findIndex(p => p.id === parseInt(id));
+                    products[index] = product;
+                    showToast('تم تعديل المنتج ✅');
+                } else {
+                    products.push(product);
+                    showToast('تم إضافة المنتج ✅');
+                }
+
+                closeModal();
+                renderProducts();
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('حدث خطأ في الحفظ');
             }
-
-            localStorage.setItem('nicecity_products', JSON.stringify(products));
-            closeModal();
-            renderProducts();
         }
 
-        function deleteProduct(id) {
+        async function deleteProduct(id) {
             if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('nicecity_products', JSON.stringify(products));
-                renderProducts();
-                showToast('تم حذف المنتج');
+                try {
+                    await db.collection('products').doc(id.toString()).delete();
+                    products = products.filter(p => p.id !== id);
+                    renderProducts();
+                    showToast('تم حذف المنتج ✅');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('حدث خطأ في الحذف');
+                }
             }
         }
 
@@ -535,7 +588,9 @@
         }
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-        renderProducts();
+        
+        // Load products on start
+        loadProducts();
     </script>
 </body>
 </html>

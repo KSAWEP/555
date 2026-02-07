@@ -936,9 +936,26 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
-        // Products Data
-        let products = [
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCHSSG-H8lARcSScKc6WX2xiYy5W5FmzUI",
+            authDomain: "nicecity-51aff.firebaseapp.com",
+            projectId: "nicecity-51aff",
+            storageBucket: "nicecity-51aff.firebasestorage.app",
+            messagingSenderId: "938934256525",
+            appId: "1:938934256525:web:415533592415996921f3c4",
+            measurementId: "G-G7GC7G0J03"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Products Data (default)
+        const defaultProducts = [
             { id: 1, name: "فك باند", price: 15.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/fRVZTQqfTh4BNwBabwODAbtVSwN4oZtaz1POer3E.png", category: "الباندات", inStock: true },
             { id: 2, name: "فك باند نهائي", price: 40.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/eZVJuhUkBNzs7kp3D1GsLTqEmLSm69WeUBSoCMpV.png", category: "الباندات", inStock: true },
             { id: 3, name: "نظام عقار", price: 100.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/Wi6pSr24hZK9Q6NojFFOm3tNu1AWGGJmIbCK0hED.png", category: "العقارات", inStock: true },
@@ -990,16 +1007,41 @@
             { id: 49, name: "𝐌𝐀𝐙𝐀𝐃", price: 5.00, image: "https://kyn.fra1.digitaloceanspaces.com/images/o3VqGchhBqXkhjaeythknierIkxSHKzMP4Cc2X81.png", category: "خدمات", inStock: true }
         ];
 
-        // Load saved products
-        const savedProducts = localStorage.getItem('nicecity_products');
-        if (savedProducts) {
-            products = JSON.parse(savedProducts);
-        }
-
+        let products = [];
         let cart = JSON.parse(localStorage.getItem('nicecity_cart')) || [];
         let currentProduct = null;
         let qty = 1;
         let currentCategory = 'all';
+
+        // Load products from Firebase
+        async function loadProducts() {
+            try {
+                const snapshot = await db.collection('products').get();
+                if (snapshot.empty) {
+                    // First time - upload default products
+                    console.log('Uploading default products to Firebase...');
+                    for (const p of defaultProducts) {
+                        await db.collection('products').doc(p.id.toString()).set(p);
+                    }
+                    products = defaultProducts;
+                } else {
+                    products = [];
+                    snapshot.forEach(doc => {
+                        products.push(doc.data());
+                    });
+                }
+                renderCategories();
+                renderProducts();
+                updateCartCount();
+            } catch (error) {
+                console.error('Firebase Error:', error);
+                // Fallback to localStorage
+                products = JSON.parse(localStorage.getItem('nicecity_products')) || defaultProducts;
+                renderCategories();
+                renderProducts();
+                updateCartCount();
+            }
+        }
 
         // Get categories
         function getCategories() {
@@ -1205,9 +1247,7 @@
         });
 
         // Init
-        renderCategories();
-        renderProducts();
-        updateCartCount();
+        loadProducts();
     </script>
 </body>
 </html>
