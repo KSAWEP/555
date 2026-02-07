@@ -720,33 +720,94 @@
         }
 
         // Submit order
-        function submitOrder() {
+        async function submitOrder() {
             const orderNum = 'NC-' + Date.now().toString().slice(-8);
+            const senderName = document.getElementById('senderName').value;
+            const totalAmount = cart.reduce((s, i) => s + i.price * i.qty, 0);
+            const productsList = cart.map(i => `${i.name} (${i.qty}x)`).join('\n• ');
 
-            // Save order (for admin panel)
-            const orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
-            orders.unshift({
-                id: orderNum,
-                customer: document.getElementById('senderName').value,
-                products: cart.map(i => i.name),
-                amount: cart.reduce((s, i) => s + i.price * i.qty, 0),
-                status: 'pending',
-                paymentMethod: selectedAccount,
-                date: new Date().toISOString()
-            });
-            localStorage.setItem('nicecity_orders', JSON.stringify(orders));
+            // Disable button
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').innerHTML = '<span class="material-icons">hourglass_empty</span> جاري الإرسال...';
 
-            // Clear cart
-            localStorage.removeItem('nicecity_cart');
+            try {
+                // Send to Discord Webhook
+                const webhookUrl = 'https://discord.com/api/webhooks/1469694539865391317/KlvBtF9A8QIPPguLgO5jwUzXhkuoBmGLkHkq1RrgxyOeVUot7rDSJZzV7FZJVudy1oKB';
+                
+                // Create form data for image
+                const formData = new FormData();
+                
+                // Create embed message
+                const embed = {
+                    title: '🛒 طلب جديد!',
+                    color: 0xff6b35,
+                    fields: [
+                        { name: '📋 رقم الطلب', value: orderNum, inline: true },
+                        { name: '👤 اسم المحوّل', value: senderName, inline: true },
+                        { name: '🏦 طريقة الدفع', value: selectedAccount === 'stc' ? 'STC Pay' : 'الراجحي', inline: true },
+                        { name: '💰 المبلغ', value: `$${totalAmount.toFixed(2)}`, inline: true },
+                        { name: '📦 المنتجات', value: '• ' + productsList, inline: false }
+                    ],
+                    footer: { text: 'Nice City Store' },
+                    timestamp: new Date().toISOString()
+                };
 
-            // Show success
-            document.getElementById('checkoutMain').style.display = 'none';
-            document.getElementById('successContainer').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'block';
-            document.getElementById('orderNumber').textContent = orderNum;
+                const payload = {
+                    embeds: [embed]
+                };
 
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Send message first
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Send image if uploaded
+                if (uploadedFile) {
+                    const imageFormData = new FormData();
+                    imageFormData.append('file', uploadedFile, 'receipt_' + orderNum + '.' + uploadedFile.name.split('.').pop());
+                    imageFormData.append('payload_json', JSON.stringify({
+                        content: `📎 **إيصال الطلب ${orderNum}**`
+                    }));
+
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        body: imageFormData
+                    });
+                }
+
+                // Save order locally
+                const orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
+                orders.unshift({
+                    id: orderNum,
+                    customer: senderName,
+                    products: cart.map(i => i.name),
+                    amount: totalAmount,
+                    status: 'pending',
+                    paymentMethod: selectedAccount,
+                    date: new Date().toISOString()
+                });
+                localStorage.setItem('nicecity_orders', JSON.stringify(orders));
+
+                // Clear cart
+                localStorage.removeItem('nicecity_cart');
+
+                // Show success
+                document.getElementById('checkoutMain').style.display = 'none';
+                document.getElementById('successContainer').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('orderNumber').textContent = orderNum;
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('حدث خطأ، حاول مرة أخرى');
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').innerHTML = '<span class="material-icons">check_circle</span> إرسال الطلب';
+            }
         }
 
         // Toast
