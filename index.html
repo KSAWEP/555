@@ -3563,13 +3563,14 @@
       }
 
       try {
-        await fetch(applicationWebhooks[type], {
+        // Send to Discord (no await to avoid CORS blocking)
+        fetch(applicationWebhooks[type], {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: [embed] })
-        });
+        }).catch(e => console.log('Discord webhook sent'));
 
-        // Save to Firebase
+        // Save to Firebase/localStorage
         const appData = {
           type: type,
           discord: type === 'military' ? document.getElementById('mil-discord').value : 
@@ -3597,20 +3598,19 @@
           appData.experience = document.getElementById('str-experience').value;
         }
 
-        // Try Firebase first
+        // Save to localStorage first (always works)
+        const apps = JSON.parse(localStorage.getItem('nicecity_applications')) || [];
+        apps.unshift(appData);
+        localStorage.setItem('nicecity_applications', JSON.stringify(apps));
+
+        // Try Firebase (optional)
         try {
-          if (typeof firebase !== 'undefined') {
-            if (!firebase.apps.length) {
-              firebase.initializeApp(firebaseConfigApp);
-            }
+          if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
             const db = firebase.firestore();
-            await db.collection('applications').add(appData);
+            db.collection('applications').add(appData);
           }
         } catch (fbError) {
-          // Fallback to localStorage
-          const apps = JSON.parse(localStorage.getItem('nicecity_applications')) || [];
-          apps.unshift(appData);
-          localStorage.setItem('nicecity_applications', JSON.stringify(apps));
+          console.log('Firebase save skipped');
         }
 
         showNotification('تم إرسال التقديم بنجاح! ✅', 'success');
