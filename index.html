@@ -3455,6 +3455,27 @@
     })();
 
     // ==================== دوال التقديمات ====================
+    // Firebase Config
+    const firebaseConfigApp = {
+        apiKey: "AIzaSyCHSSG-H8lARcSScKc6WX2xiYy5W5FmzUI",
+        authDomain: "nicecity-51aff.firebaseapp.com",
+        projectId: "nicecity-51aff",
+        storageBucket: "nicecity-51aff.firebasestorage.app",
+        messagingSenderId: "938934256525",
+        appId: "1:938934256525:web:415533592415996921f3c4"
+    };
+
+    // Initialize Firebase for applications if not already
+    if (!window.firebaseAppInitialized) {
+        const script1 = document.createElement('script');
+        script1.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
+        document.head.appendChild(script1);
+        
+        const script2 = document.createElement('script');
+        script2.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js';
+        document.head.appendChild(script2);
+    }
+
     const applicationWebhooks = {
       military: 'https://discord.com/api/webhooks/1469713241545510953/Lbqlq0uXXNFPZx_cK4jsNinnqr8CpqfgsFXbJf8I7FunATEUTWitzKtdTNBTVZ1KVb4D',
       admin: 'https://discord.com/api/webhooks/1469712909734121582/OeUPI0YG6BO7B16Dmh5DyeZ24YVAH3ASbvovlSgEfKtW4b1M16SHfIx84_qtL0049tVG',
@@ -3547,6 +3568,50 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ embeds: [embed] })
         });
+
+        // Save to Firebase
+        const appData = {
+          type: type,
+          discord: type === 'military' ? document.getElementById('mil-discord').value : 
+                   type === 'admin' ? document.getElementById('adm-discord').value :
+                   document.getElementById('str-discord').value,
+          date: new Date().toISOString(),
+          status: 'pending'
+        };
+
+        if (type === 'military') {
+          appData.name = document.getElementById('mil-name').value;
+          appData.character = document.getElementById('mil-character').value;
+          appData.age = document.getElementById('mil-age').value;
+        } else if (type === 'admin') {
+          appData.name = document.getElementById('adm-name').value;
+          appData.age = document.getElementById('adm-age').value;
+          appData.experience = document.getElementById('adm-experience').value;
+          appData.reason = document.getElementById('adm-reason').value;
+          appData.previous = document.getElementById('adm-previous').value;
+        } else if (type === 'streamer') {
+          appData.platform = document.getElementById('str-platform').value;
+          appData.channel = document.getElementById('str-channel').value;
+          appData.followers = document.getElementById('str-followers').value;
+          appData.link = document.getElementById('str-link').value;
+          appData.experience = document.getElementById('str-experience').value;
+        }
+
+        // Try Firebase first
+        try {
+          if (typeof firebase !== 'undefined') {
+            if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseConfigApp);
+            }
+            const db = firebase.firestore();
+            await db.collection('applications').add(appData);
+          }
+        } catch (fbError) {
+          // Fallback to localStorage
+          const apps = JSON.parse(localStorage.getItem('nicecity_applications')) || [];
+          apps.unshift(appData);
+          localStorage.setItem('nicecity_applications', JSON.stringify(apps));
+        }
 
         showNotification('تم إرسال التقديم بنجاح! ✅', 'success');
         event.target.reset();

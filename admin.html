@@ -1230,15 +1230,18 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Load all data
+        // Load all data from Firebase
         async function loadAllData() {
+            showToast('جاري تحميل البيانات...');
             await loadProducts();
-            loadOrders();
-            loadApplications();
+            await loadOrders();
+            await loadApplications();
+            await loadSettings();
             updateStats();
+            showToast('تم تحميل البيانات ✅');
         }
 
-        // Products
+        // ==================== Products ====================
         async function loadProducts() {
             try {
                 const snapshot = await db.collection('products').get();
@@ -1352,12 +1355,22 @@
             }
         }
 
-        // Orders
-        function loadOrders() {
-            orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
-            renderOrders();
-            renderRecentOrders();
-            document.getElementById('ordersCount').textContent = orders.length;
+        // ==================== Orders (Firebase) ====================
+        async function loadOrders() {
+            try {
+                const snapshot = await db.collection('orders').orderBy('date', 'desc').get();
+                orders = [];
+                snapshot.forEach(doc => orders.push({ docId: doc.id, ...doc.data() }));
+                renderOrders();
+                renderRecentOrders();
+                document.getElementById('ordersCount').textContent = orders.length;
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                // Fallback to localStorage
+                orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
+                renderOrders();
+                renderRecentOrders();
+            }
         }
 
         function renderOrders(filtered = null) {
@@ -1373,15 +1386,15 @@
                 <tr>
                     <td><strong>${o.id}</strong></td>
                     <td>${o.customer}</td>
-                    <td>${o.products.slice(0, 2).join(', ')}${o.products.length > 2 ? '...' : ''}</td>
+                    <td>${Array.isArray(o.products) ? o.products.slice(0, 2).join(', ') + (o.products.length > 2 ? '...' : '') : o.products}</td>
                     <td><strong>$${o.amount.toFixed(2)}</strong></td>
                     <td>${o.paymentMethod === 'stc' ? 'STC Pay' : 'الراجحي'}</td>
                     <td>${getStatusBadge(o.status)}</td>
                     <td>${new Date(o.date).toLocaleDateString('ar')}</td>
                     <td>
                         <div class="actions">
-                            <button class="action-btn approve" onclick="updateOrderStatus('${o.id}', 'completed')"><span class="material-icons">check</span></button>
-                            <button class="action-btn delete" onclick="updateOrderStatus('${o.id}', 'cancelled')"><span class="material-icons">close</span></button>
+                            <button class="action-btn approve" onclick="updateOrderStatus('${o.docId || o.id}', 'completed')"><span class="material-icons">check</span></button>
+                            <button class="action-btn delete" onclick="updateOrderStatus('${o.docId || o.id}', 'cancelled')"><span class="material-icons">close</span></button>
                         </div>
                     </td>
                 </tr>
@@ -1419,14 +1432,23 @@
             }
         }
 
-        function updateOrderStatus(id, status) {
-            const order = orders.find(o => o.id === id);
-            if (order) {
-                order.status = status;
-                localStorage.setItem('nicecity_orders', JSON.stringify(orders));
-                renderOrders();
-                renderRecentOrders();
+        async function updateOrderStatus(docId, status) {
+            try {
+                await db.collection('orders').doc(docId).update({ status: status });
+                await loadOrders();
+                updateStats();
                 showToast('تم تحديث حالة الطلب ✅');
+            } catch (error) {
+                console.error('Error:', error);
+                // Fallback to localStorage
+                const order = orders.find(o => o.id === docId || o.docId === docId);
+                if (order) {
+                    order.status = status;
+                    localStorage.setItem('nicecity_orders', JSON.stringify(orders));
+                    renderOrders();
+                    renderRecentOrders();
+                    showToast('تم تحديث حالة الطلب ✅');
+                }
             }
         }
 
@@ -1439,11 +1461,19 @@
             }
         }
 
-        // Applications
-        function loadApplications() {
-            applications = JSON.parse(localStorage.getItem('nicecity_applications')) || [];
-            renderApplications();
-            document.getElementById('applicationsCount').textContent = applications.length;
+        // ==================== Applications (Firebase) ====================
+        async function loadApplications() {
+            try {
+                const snapshot = await db.collection('applications').orderBy('date', 'desc').get();
+                applications = [];
+                snapshot.forEach(doc => applications.push({ docId: doc.id, ...doc.data() }));
+                renderApplications();
+                document.getElementById('applicationsCount').textContent = applications.length;
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                applications = JSON.parse(localStorage.getItem('nicecity_applications')) || [];
+                renderApplications();
+            }
         }
 
         function renderApplications(filtered = null) {
@@ -1527,56 +1557,92 @@
             document.getElementById('applicationModal').classList.remove('active');
         }
 
-        function updateAppStatus(index, status) {
-            applications[index].status = status;
-            localStorage.setItem('nicecity_applications', JSON.stringify(applications));
-            renderApplications();
-            showToast('تم تحديث حالة التقديم ✅');
+        async function updateAppStatus(index, status) {
+            const app = applications[index];
+            try {
+                await db.collection('applications').doc(app.docId).update({ status: status });
+                await loadApplications();
+                showToast('تم تحديث حالة التقديم ✅');
+            } catch (error) {
+                console.error('Error:', error);
+                applications[index].status = status;
+                localStorage.setItem('nicecity_applications', JSON.stringify(applications));
+                renderApplications();
+                showToast('تم تحديث حالة التقديم ✅');
+            }
         }
 
-        // Stats
+        // ==================== Stats ====================
         function updateStats() {
             document.getElementById('stat-products').textContent = products.length;
             document.getElementById('stat-orders').textContent = orders.length;
             document.getElementById('stat-applications').textContent = applications.length;
             
-            const revenue = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.amount, 0);
+            const revenue = orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + (o.amount || 0), 0);
             document.getElementById('stat-revenue').textContent = '$' + revenue.toFixed(2);
         }
 
-        // Settings
-        function saveSettings() {
+        // ==================== Settings (Firebase) ====================
+        async function loadSettings() {
+            try {
+                const doc = await db.collection('settings').doc('main').get();
+                if (doc.exists) {
+                    const settings = doc.data();
+                    if (settings.discord) document.getElementById('setting-discord').value = settings.discord;
+                    if (settings.tiktok) document.getElementById('setting-tiktok').value = settings.tiktok;
+                    if (settings.youtube) document.getElementById('setting-youtube').value = settings.youtube;
+                    if (settings.stcName) document.getElementById('setting-stc-name').value = settings.stcName;
+                    if (settings.stcAccount) document.getElementById('setting-stc-account').value = settings.stcAccount;
+                    if (settings.rajhiName) document.getElementById('setting-rajhi-name').value = settings.rajhiName;
+                    if (settings.rajhiAccount) document.getElementById('setting-rajhi-account').value = settings.rajhiAccount;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                // Fallback to localStorage
+                const settings = JSON.parse(localStorage.getItem('nicecity_settings')) || {};
+                if (settings.discord) document.getElementById('setting-discord').value = settings.discord;
+                if (settings.tiktok) document.getElementById('setting-tiktok').value = settings.tiktok;
+                if (settings.youtube) document.getElementById('setting-youtube').value = settings.youtube;
+
+                const payment = JSON.parse(localStorage.getItem('nicecity_payment')) || {};
+                if (payment.stcName) document.getElementById('setting-stc-name').value = payment.stcName;
+                if (payment.stcAccount) document.getElementById('setting-stc-account').value = payment.stcAccount;
+                if (payment.rajhiName) document.getElementById('setting-rajhi-name').value = payment.rajhiName;
+                if (payment.rajhiAccount) document.getElementById('setting-rajhi-account').value = payment.rajhiAccount;
+            }
+        }
+
+        async function saveSettings() {
             const settings = {
                 discord: document.getElementById('setting-discord').value,
                 tiktok: document.getElementById('setting-tiktok').value,
                 youtube: document.getElementById('setting-youtube').value
             };
-            localStorage.setItem('nicecity_settings', JSON.stringify(settings));
-            showToast('تم حفظ الإعدادات ✅');
+            
+            try {
+                await db.collection('settings').doc('main').set(settings, { merge: true });
+                showToast('تم حفظ الإعدادات ✅');
+            } catch (error) {
+                localStorage.setItem('nicecity_settings', JSON.stringify(settings));
+                showToast('تم حفظ الإعدادات ✅');
+            }
         }
 
-        function savePaymentSettings() {
+        async function savePaymentSettings() {
             const payment = {
                 stcName: document.getElementById('setting-stc-name').value,
                 stcAccount: document.getElementById('setting-stc-account').value,
                 rajhiName: document.getElementById('setting-rajhi-name').value,
                 rajhiAccount: document.getElementById('setting-rajhi-account').value
             };
-            localStorage.setItem('nicecity_payment', JSON.stringify(payment));
-            showToast('تم حفظ بيانات الدفع ✅');
-        }
-
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('nicecity_settings')) || {};
-            if (settings.discord) document.getElementById('setting-discord').value = settings.discord;
-            if (settings.tiktok) document.getElementById('setting-tiktok').value = settings.tiktok;
-            if (settings.youtube) document.getElementById('setting-youtube').value = settings.youtube;
-
-            const payment = JSON.parse(localStorage.getItem('nicecity_payment')) || {};
-            if (payment.stcName) document.getElementById('setting-stc-name').value = payment.stcName;
-            if (payment.stcAccount) document.getElementById('setting-stc-account').value = payment.stcAccount;
-            if (payment.rajhiName) document.getElementById('setting-rajhi-name').value = payment.rajhiName;
-            if (payment.rajhiAccount) document.getElementById('setting-rajhi-account').value = payment.rajhiAccount;
+            
+            try {
+                await db.collection('settings').doc('main').set(payment, { merge: true });
+                showToast('تم حفظ بيانات الدفع ✅');
+            } catch (error) {
+                localStorage.setItem('nicecity_payment', JSON.stringify(payment));
+                showToast('تم حفظ بيانات الدفع ✅');
+            }
         }
 
         // Toast

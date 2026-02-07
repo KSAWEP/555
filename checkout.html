@@ -643,7 +643,22 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCHSSG-H8lARcSScKc6WX2xiYy5W5FmzUI",
+            authDomain: "nicecity-51aff.firebaseapp.com",
+            projectId: "nicecity-51aff",
+            storageBucket: "nicecity-51aff.firebasestorage.app",
+            messagingSenderId: "938934256525",
+            appId: "1:938934256525:web:415533592415996921f3c4"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         let cart = JSON.parse(localStorage.getItem('nicecity_cart')) || [];
         let selectedAccount = null;
         let uploadedFile = null;
@@ -777,9 +792,8 @@
                     });
                 }
 
-                // Save order locally
-                const orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
-                orders.unshift({
+                // Save order to Firebase
+                const orderData = {
                     id: orderNum,
                     customer: senderName,
                     products: cart.map(i => i.name),
@@ -787,8 +801,16 @@
                     status: 'pending',
                     paymentMethod: selectedAccount,
                     date: new Date().toISOString()
-                });
-                localStorage.setItem('nicecity_orders', JSON.stringify(orders));
+                };
+
+                try {
+                    await db.collection('orders').doc(orderNum).set(orderData);
+                } catch (e) {
+                    console.log('Firebase save failed, using localStorage');
+                    const orders = JSON.parse(localStorage.getItem('nicecity_orders')) || [];
+                    orders.unshift(orderData);
+                    localStorage.setItem('nicecity_orders', JSON.stringify(orders));
+                }
 
                 // Clear cart
                 localStorage.removeItem('nicecity_cart');
