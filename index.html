@@ -1865,7 +1865,7 @@
           <li><a href="#" onclick="navigateToPage('about')">من نحن</a></li>
           <li><a href="#" onclick="navigateToPage('founders')">المؤسسين</a></li>
           <li><a href="#" onclick="navigateToPage('social')">منصات التواصل</a></li>
-          <li><a href="#" href="./applications.html">التقديم</a></li>
+          <li><a href="#" onclick="navigateToPage('jobs')">التقديم</a></li>
         </ul>
       </nav>
       <button class="btn-angled" id="btn-login-main" onclick="window.location.href='./store.html'">الدخول للمتجر</button>
@@ -1919,7 +1919,7 @@
                 نحن هنا لنصنع الفرق، ونجعل من نايس سيتي مكانًا يتجاوز توقعاتكم. ثقتكم بنا هي دافعنا للاستمرار والتطوير، وهدفنا دائمًا هو تقديم الأفضل لكم. شكرًا لكونكم جزءًا من هذا الوطن!
               </p>
             </div>
-            <button class="btn-angled" href="./applications.html">إنضم إلينا</button>
+            <button class="btn-angled" onclick="navigateToPage('jobs')">إنضم إلينا</button>
           </div>
           <div class="about-left">
             <div class="logo-big-circle"></div>
@@ -2072,56 +2072,55 @@
         <span class="section-title-small">APPLY / التقديم</span>
         <h2 style="font-size: 3.5rem; color:#fff; font-weight:900; text-align:center;">التقديم</h2>
         <div style="width: 50px; height: 4px; background:var(--color-primary); margin: 15px auto 60px;"></div>
-        <p style="text-align:center; color:#aaa; margin-bottom:60px; font-size:1.1rem;">يمكنك التقديم على الوظائف
-          المتاحة / You can apply for available positions</p>
+        <p style="text-align:center; color:#aaa; margin-bottom:60px; font-size:1.1rem;">انضم لفريق نايس سيتي واختر الوظيفة المناسبة لك</p>
 
         <div class="jobs-grid">
-          <div class="job-card">
-            <div class="job-logo-bg">MC</div>
+          <!-- العسكرية -->
+          <div class="job-card" onclick="openApplicationModal('military')">
+            <div class="job-logo-bg"><i class="fas fa-shield-alt" style="font-size: 2rem;"></i></div>
             <div class="job-content">
-              <h3>PROJECT MANAGER</h3>
-              <p class="job-desc">Job description : We are seeking a remote Project Manager with a strong technical
-                background to lead the development & operations...</p>
+              <h3>العسكرية</h3>
+              <p class="job-desc">انضم للقوات العسكرية وساهم في حماية المدينة وتطبيق القانون والعمل ضمن فريق محترف.</p>
               <div class="job-date">
-                <i class="fa-solid fa-calendar"></i>
-                <span>2025-11-17</span>
+                <i class="fa-solid fa-users"></i>
+                <span>متاح للتقديم</span>
               </div>
-              <button class="job-apply-btn" onclick="openApply('Project Manager')">
-                <span>التقديم الآن / Apply Now</span>
+              <button class="job-apply-btn">
+                <span>التقديم الآن</span>
                 <i class="fa-solid fa-arrow-left"></i>
               </button>
             </div>
           </div>
 
-          <div class="job-card">
-            <div class="job-logo-bg">MC</div>
+          <!-- الإدارة -->
+          <div class="job-card" onclick="openApplicationModal('admin')">
+            <div class="job-logo-bg"><i class="fas fa-user-shield" style="font-size: 2rem;"></i></div>
             <div class="job-content">
-              <h3>3D GENERALIST</h3>
-              <p class="job-desc">Job description : We are looking for a remote 3D Artist to create high-quality 3D
-                assets (maps, props, cars, characters...)...</p>
+              <h3>الإدارة</h3>
+              <p class="job-desc">انضم لفريق الإدارة وساعد في إدارة السيرفر ومساعدة اللاعبين وحل المشاكل.</p>
               <div class="job-date">
-                <i class="fa-solid fa-calendar"></i>
-                <span>2025-11-17</span>
+                <i class="fa-solid fa-users"></i>
+                <span>متاح للتقديم</span>
               </div>
-              <button class="job-apply-btn" onclick="openApply('3D Generalist')">
-                <span>التقديم الآن / Apply Now</span>
+              <button class="job-apply-btn">
+                <span>التقديم الآن</span>
                 <i class="fa-solid fa-arrow-left"></i>
               </button>
             </div>
           </div>
 
-          <div class="job-card">
-            <div class="job-logo-bg">MC</div>
+          <!-- الستريمر -->
+          <div class="job-card" onclick="openApplicationModal('streamer')">
+            <div class="job-logo-bg"><i class="fas fa-video" style="font-size: 2rem;"></i></div>
             <div class="job-content">
-              <h3>GAMEPLAY PROGRAMMER</h3>
-              <p class="job-desc">Job description : We are seeking a remote Developer for a FiveM server. You will
-                design and implement the server...</p>
+              <h3>الستريمر</h3>
+              <p class="job-desc">صانع محتوى؟ انضم لنا! الحد الأدنى 200 متابع. شارك إبداعك مع مجتمع نايس سيتي.</p>
               <div class="job-date">
-                <i class="fa-solid fa-calendar"></i>
-                <span>2025-11-17</span>
+                <i class="fa-solid fa-users"></i>
+                <span>الحد الأدنى 200 متابع</span>
               </div>
-              <button class="job-apply-btn" onclick="openApply('Gameplay Programmer')">
-                <span>التقديم الآن / Apply Now</span>
+              <button class="job-apply-btn">
+                <span>التقديم الآن</span>
                 <i class="fa-solid fa-arrow-left"></i>
               </button>
             </div>
@@ -2129,6 +2128,151 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Modal: العسكرية -->
+  <div id="modal-military" class="modal" style="display:none;">
+    <div class="login-content" style="max-width: 550px;">
+      <div class="login-header">
+        <h2><i class="fas fa-shield-alt" style="color: var(--color-primary);"></i> تقديم العسكرية</h2>
+        <p>املأ النموذج للانضمام للقوات العسكرية</p>
+      </div>
+      <form onsubmit="submitApplicationForm(event, 'military')">
+        <div class="form-group">
+          <label>اسمك <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="mil-name" placeholder="أدخل اسمك الحقيقي" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>اسم الشخصية <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="mil-character" placeholder="اسم شخصيتك في السيرفر" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>اسم الديسكورد <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="mil-discord" placeholder="مثال: ahmed#1234" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>العمر <span style="color:#dc3545;">*</span></label>
+          <input type="number" id="mil-age" placeholder="عمرك" min="13" max="99" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <input type="checkbox" id="mil-rules" required style="margin-left: 8px;">
+          <label for="mil-rules">أوافق على قوانين السيرفر</label>
+        </div>
+        <button type="submit" class="login-btn" id="mil-submit-btn">
+          <i class="fas fa-paper-plane"></i> إرسال التقديم
+        </button>
+      </form>
+      <button class="cancel-btn" onclick="closeApplicationModal('military')">
+        <i class="fas fa-times"></i> إغلاق
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: الإدارة -->
+  <div id="modal-admin" class="modal" style="display:none;">
+    <div class="login-content" style="max-width: 550px;">
+      <div class="login-header">
+        <h2><i class="fas fa-user-shield" style="color: var(--color-primary);"></i> تقديم الإدارة</h2>
+        <p>املأ النموذج للانضمام لفريق الإدارة</p>
+      </div>
+      <form onsubmit="submitApplicationForm(event, 'admin')">
+        <div class="form-group">
+          <label>اسمك <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="adm-name" placeholder="أدخل اسمك الحقيقي" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>اسم حسابك ديسكورد <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="adm-discord" placeholder="مثال: ahmed#1234" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>العمر <span style="color:#dc3545;">*</span></label>
+          <input type="number" id="adm-age" placeholder="عمرك" min="13" max="99" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>الخبرات الإدارية <span style="color:#dc3545;">*</span></label>
+          <textarea id="adm-experience" placeholder="اكتب خبراتك الإدارية السابقة..." required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff; min-height:80px; resize:vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>سبب التقديم <span style="color:#dc3545;">*</span></label>
+          <textarea id="adm-reason" placeholder="لماذا تريد الانضمام للإدارة؟" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff; min-height:80px; resize:vertical;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>هل كنت إداري بسيرفر آخر؟ <span style="color:#dc3545;">*</span></label>
+          <select id="adm-previous" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+            <option value="">اختر...</option>
+            <option value="نعم">نعم</option>
+            <option value="لا">لا</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <input type="checkbox" id="adm-rules" required style="margin-left: 8px;">
+          <label for="adm-rules">أوافق على قوانين السيرفر</label>
+        </div>
+        <button type="submit" class="login-btn" id="adm-submit-btn">
+          <i class="fas fa-paper-plane"></i> إرسال التقديم
+        </button>
+      </form>
+      <button class="cancel-btn" onclick="closeApplicationModal('admin')">
+        <i class="fas fa-times"></i> إغلاق
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: الستريمر -->
+  <div id="modal-streamer" class="modal" style="display:none;">
+    <div class="login-content" style="max-width: 550px;">
+      <div class="login-header">
+        <h2><i class="fas fa-video" style="color: var(--color-primary);"></i> تقديم الستريمر</h2>
+        <p>املأ النموذج للانضمام كصانع محتوى</p>
+      </div>
+      <div style="background: rgba(255, 107, 53, 0.1); border-right: 3px solid var(--color-primary); padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #aaa;">
+        <i class="fas fa-info-circle" style="color: var(--color-primary); margin-left: 5px;"></i>
+        ملاحظة: عدد المتابعين لا يقل عن 200
+      </div>
+      <form onsubmit="submitApplicationForm(event, 'streamer')">
+        <div class="form-group">
+          <label>اسم الديسكورد <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="str-discord" placeholder="مثال: ahmed#1234" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>اسم المنصة <span style="color:#dc3545;">*</span></label>
+          <select id="str-platform" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+            <option value="">اختر المنصة...</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Twitch">Twitch</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Kick">Kick</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>اسم القناة أو الحساب <span style="color:#dc3545;">*</span></label>
+          <input type="text" id="str-channel" placeholder="اسم قناتك أو حسابك" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>عدد المتابعين أو المشتركين <span style="color:#dc3545;">*</span></label>
+          <input type="number" id="str-followers" placeholder="الحد الأدنى 200" min="200" required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>رابط القناة أو الحساب <span style="color:#dc3545;">*</span></label>
+          <input type="url" id="str-link" placeholder="https://..." required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff;">
+        </div>
+        <div class="form-group">
+          <label>خبراتك وماذا ستقدم للسيرفر؟ <span style="color:#dc3545;">*</span></label>
+          <textarea id="str-experience" placeholder="اكتب خبراتك وما ستقدمه..." required style="width:100%; padding:12px 15px; background:rgba(58,58,74,0.8); border:1px solid #444; border-radius:8px; color:#fff; min-height:80px; resize:vertical;"></textarea>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <input type="checkbox" id="str-rules" required style="margin-left: 8px;">
+          <label for="str-rules">قرأت القوانين وأوافق عليها</label>
+        </div>
+        <button type="submit" class="login-btn" id="str-submit-btn">
+          <i class="fas fa-paper-plane"></i> إرسال التقديم
+        </button>
+      </form>
+      <button class="cancel-btn" onclick="closeApplicationModal('streamer')">
+        <i class="fas fa-times"></i> إغلاق
+      </button>
+    </div>
   </div>
 
   <footer>
@@ -2156,7 +2300,7 @@
           <div class="footer-column">
             <h4>خدماتنا</h4>
             <ul>
-              <li><a href="#" href="./applications.html"><i class="fas fa-briefcase"></i> التقديم على الوظائف</a></li>
+              <li><a href="#" onclick="navigateToPage('jobs')"><i class="fas fa-briefcase"></i> التقديم على الوظائف</a></li>
               <li><a href="./store.html"><i class="fas fa-shopping-cart"></i> المتجر</a></li>
               <li><a href="#" onclick="openRegister()"><i class="fas fa-user-plus"></i> إنشاء حساب</a></li>
               <li><a href="#" onclick="showNotification('صفحة الدعم قيد التطوير', 'info')"><i class="fas fa-headset"></i> الدعم الفني</a></li>
@@ -3237,6 +3381,112 @@
         overlay.remove();
       }, 4200);
     })();
+
+    // ==================== دوال التقديمات ====================
+    const applicationWebhooks = {
+      military: 'https://discord.com/api/webhooks/1469713241545510953/Lbqlq0uXXNFPZx_cK4jsNinnqr8CpqfgsFXbJf8I7FunATEUTWitzKtdTNBTVZ1KVb4D',
+      admin: 'https://discord.com/api/webhooks/1469712909734121582/OeUPI0YG6BO7B16Dmh5DyeZ24YVAH3ASbvovlSgEfKtW4b1M16SHfIx84_qtL0049tVG',
+      streamer: 'https://discord.com/api/webhooks/1469712909734121582/OeUPI0YG6BO7B16Dmh5DyeZ24YVAH3ASbvovlSgEfKtW4b1M16SHfIx84_qtL0049tVG'
+    };
+
+    function openApplicationModal(type) {
+      document.getElementById('modal-' + type).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeApplicationModal(type) {
+      document.getElementById('modal-' + type).style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // Close on click outside
+    ['military', 'admin', 'streamer'].forEach(type => {
+      document.getElementById('modal-' + type).addEventListener('click', function(e) {
+        if (e.target === this) closeApplicationModal(type);
+      });
+    });
+
+    async function submitApplicationForm(event, type) {
+      event.preventDefault();
+      
+      let embed;
+      let submitBtn;
+
+      if (type === 'military') {
+        submitBtn = document.getElementById('mil-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        
+        embed = {
+          title: '📋 تقديم جديد - العسكرية',
+          color: 0xff6b35,
+          fields: [
+            { name: '👤 الاسم', value: document.getElementById('mil-name').value, inline: true },
+            { name: '🎮 اسم الشخصية', value: document.getElementById('mil-character').value, inline: true },
+            { name: '💬 الديسكورد', value: document.getElementById('mil-discord').value, inline: true },
+            { name: '🎂 العمر', value: document.getElementById('mil-age').value + ' سنة', inline: true }
+          ],
+          footer: { text: 'Nice City - تقديم العسكرية' },
+          timestamp: new Date().toISOString()
+        };
+      } else if (type === 'admin') {
+        submitBtn = document.getElementById('adm-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        
+        embed = {
+          title: '📋 تقديم جديد - الإدارة',
+          color: 0xff6b35,
+          fields: [
+            { name: '👤 الاسم', value: document.getElementById('adm-name').value, inline: true },
+            { name: '💬 الديسكورد', value: document.getElementById('adm-discord').value, inline: true },
+            { name: '🎂 العمر', value: document.getElementById('adm-age').value + ' سنة', inline: true },
+            { name: '📝 الخبرات الإدارية', value: document.getElementById('adm-experience').value, inline: false },
+            { name: '❓ سبب التقديم', value: document.getElementById('adm-reason').value, inline: false },
+            { name: '🔄 إداري سابق؟', value: document.getElementById('adm-previous').value, inline: true }
+          ],
+          footer: { text: 'Nice City - تقديم الإدارة' },
+          timestamp: new Date().toISOString()
+        };
+      } else if (type === 'streamer') {
+        submitBtn = document.getElementById('str-submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        
+        embed = {
+          title: '📋 تقديم جديد - الستريمر',
+          color: 0xff6b35,
+          fields: [
+            { name: '💬 الديسكورد', value: document.getElementById('str-discord').value, inline: true },
+            { name: '📺 المنصة', value: document.getElementById('str-platform').value, inline: true },
+            { name: '📛 اسم القناة', value: document.getElementById('str-channel').value, inline: true },
+            { name: '👥 عدد المتابعين', value: document.getElementById('str-followers').value, inline: true },
+            { name: '🔗 الرابط', value: document.getElementById('str-link').value, inline: false },
+            { name: '📝 الخبرات وما سيقدمه', value: document.getElementById('str-experience').value, inline: false }
+          ],
+          footer: { text: 'Nice City - تقديم الستريمر' },
+          timestamp: new Date().toISOString()
+        };
+      }
+
+      try {
+        await fetch(applicationWebhooks[type], {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embeds: [embed] })
+        });
+
+        showNotification('تم إرسال التقديم بنجاح! ✅', 'success');
+        event.target.reset();
+        closeApplicationModal(type);
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('حدث خطأ، حاول مرة أخرى', 'error');
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال التقديم';
+    }
   </script>
 </body>
 </html>
